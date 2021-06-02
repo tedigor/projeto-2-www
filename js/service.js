@@ -13,8 +13,11 @@ function getCompetitions() {
         type: 'GET',
     })
         .done((values) => {
-            let formatedCompetition = formatCompetition(values);
-            showCompetitions(formatedCompetition);
+            showCompetitions(formatCompetition(values));
+            $('#brasil-button').click(() => {
+                $('.competicoes').remove();
+                showCompetitions(formatCompetition(values, 'Brazil'));
+            });
         })
         .fail((msg) => {
             console.log(msg);
@@ -26,7 +29,7 @@ function showCompetitions(competitions) {
 
 
     for (let i = 0; i < competitions.length; i++) {
-        $('#competition-data').append('<tr>' +
+        $('#competition-data').append('<tr class="competicoes">' +
             '<td class="text-center">' + competitions[i].pais + '</td>' +
             '<td class="text-center">' + competitions[i].competicao + '</td>' +
             '<td class="text-center">' + competitions[i].dataDeinicio + '</td>' +
@@ -37,9 +40,10 @@ function showCompetitions(competitions) {
 
 };
 
-
-function formatCompetition(values) {
+function formatCompetition(values, flag) {
     let formatedCompetition = [];
+    let brazilianCompetitions = [];
+
     for (let i = 0; i < values.competitions.length; i++) {
 
         let competition = {
@@ -54,12 +58,16 @@ function formatCompetition(values) {
             competition.dataDeinicio = formatDate(values.competitions[i].currentSeason.startDate);
         }
 
+        if (values.competitions[i].area.name === 'Brazil') {
+            brazilianCompetitions.push(competition);
+        }
         formatedCompetition.push(competition);
     }
-    return formatedCompetition;
+
+    return flag === 'Brazil' ? brazilianCompetitions : formatedCompetition;
 }
 
-const formatDate = function (date) {
+function formatDate(date) {
     let formatedDate = date.split('-');
 
     return `${formatedDate[2]}-${formatedDate[1]}-${formatedDate[0]}`;
